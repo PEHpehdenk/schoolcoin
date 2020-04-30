@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+   .addsmt {
+    background: navy;
+    color: white
+   }
+   .profile {
+       background: green;
+       color: aliceblue;
+   }
+   .support {
+       background: darkblue;
+       color: aliceblue;
+   }
+    body {
+        opacity: 0.8;
+        background: #c7b39b url(https://pcvector.net/uploads/posts/2018-08/1533326959_low-poly-background-generator-min.png); /* Цвет фона и путь к файлу */
+        color: #fff; /* Цвет текста */
+    }
+</style>
+{% if current_user.is_authenticated %}
+    <a href="/vacancy" type="button" class="addsmt">Создать вакансию</a>
+    <a href="/tasks" type="button" class="addsmt">Написать задачу</a>
+    <a href="/news" type="button" class="addsmt">Выставить новость</a>
+    <a href="/account" type="button" class="profile">Перейти в свой профиль</a>
+    <a href="/support" type="button" class="support">Обратиться в службу поддержки</a>
+{% endif %}
+<br><br>
+<h1>Главная страница</h1>
+<br>
+{% for item in news%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.content}}
+    </div>
+    <div>
+        <i>
+        Автор: {{item.user.name}}; Дата написания: {{item.created_date}};
+        Тип записи: новость;
+        </i>
+    </div>
+    <br>
+    {% if current_user.is_authenticated and current_user == item.user %}
+        <div>
+            <a href="/news/{{ item.id }}" class="btn btn-warning">Изменить</a>
+            <a href="/news_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+<br>
+{% for item in tasks%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.content}}
+    </div>
+    <div>
+        <i>Автор: {{item.user.name}}, Дата написания - {{item.created_date}};
+        Цена задачи: {{item.cost}};
+        Всего осталось пользователей, которые могут ответить: {{item.reusable}};
+        Тип записи: Задача</i>
+    </div>
+    <br>
+    {% if item.reusable <= 0 %}
+        <div>Ответ задачи: {{item.answeroftask}}</div>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user == item.user %}
+        <div>
+            <a href="/tasks_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+        </div>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user.id != item.user.id and item.reusable > 0 %}
+        <div>
+            <a href="/tasks_answer/{{ item.id }}" class="btn btn-warning">Ответить</a>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+<br>
+{% for item in vacancys%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.content}}
+    </div>
+    <div>
+        <i>
+        Автор: {{item.user.name}}, Дата написания - {{item.created_date}};
+        Ваша цель: {{item.title}};
+        Требования: {{item.content}};
+        </i>
+    </div>
+    <br>
+    {% if current_user.is_authenticated and current_user == item.user %}
+        <div>
+            <a href="/vacancys_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+        </div>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user.id != item.user.id %}
+        <div>
+            <a href="/vacancys_form/{{ item.id }}" class="btn btn-warning">Откликнуться</a>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
